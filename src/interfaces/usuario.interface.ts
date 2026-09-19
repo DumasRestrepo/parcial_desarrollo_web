@@ -3,4 +3,5 @@ export interface Usuario {
   nombre: string;
   clave: string;
   estado: boolean;
+  rol?: 'ADMIN' | 'USER';
 }

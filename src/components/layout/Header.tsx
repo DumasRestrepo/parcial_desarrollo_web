@@ -120,7 +120,7 @@ import { useCart } from '../../context/CartContext';
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const { cartCount, toggleCart } = useCart();
 
   return (
@@ -185,7 +185,29 @@ export function Header() {
                   gap: '2px',
                 }}
               >
-                <span>Hola, {user?.nombre || 'admin'}</span>
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                  }}
+                >
+                  <span>Hola, {user?.nombre || 'admin'}</span>
+                  {isAdmin && (
+                    <span
+                      style={{
+                        fontSize: '0.6rem',
+                        background: 'var(--color-primary)',
+                        color: 'var(--color-surface)',
+                        padding: '2px 4px',
+                        borderRadius: '4px',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      ADMIN
+                    </span>
+                  )}
+                </span>
                 <button
                   onClick={logout}
                   style={{
@@ -227,19 +249,21 @@ export function Header() {
         <div
           className={`container app-navbar__inner${menuOpen ? ' is-open' : ''}`}
         >
-          {links.map((l) => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              end={l.end}
-              onClick={() => setMenuOpen(false)}
-              className={({ isActive }) =>
-                `app-navbar__link${isActive ? ' app-navbar__link--active' : ''}`
-              }
-            >
-              {l.label}
-            </NavLink>
-          ))}
+          {links
+            .filter((l) => isAdmin || l.to !== '/usuarios')
+            .map((l) => (
+              <NavLink
+                key={l.to}
+                to={l.to}
+                end={l.end}
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  `app-navbar__link${isActive ? ' app-navbar__link--active' : ''}`
+                }
+              >
+                {l.label}
+              </NavLink>
+            ))}
         </div>
       </nav>
     </>

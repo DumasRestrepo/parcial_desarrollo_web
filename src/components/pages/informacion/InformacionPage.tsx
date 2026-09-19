@@ -1,6 +1,10 @@
 // Libraries
 import { useEffect, useState } from 'react';
 
+// Context
+import { useAuth } from '../../../context/AuthContext';
+import { useAlert } from '../../../context/AlertContext';
+
 // Interfaces
 import type { Information } from '../../../interfaces';
 
@@ -18,11 +22,12 @@ const VACIO: Omit<Information, 'id'> = {
 };
 
 export function InformacionPage() {
+  const { isAdmin } = useAuth();
+  const { showToast, showConfirm } = useAlert();
   const [registros, setRegistros] = useState<Information[]>([]);
   const [form, setForm] = useState<Omit<Information, 'id'>>(VACIO);
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   async function cargar() {
     try {
@@ -30,7 +35,7 @@ export function InformacionPage() {
       const data = await informationRepository.getAll();
       setRegistros(data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error al cargar');
+      showToast(e instanceof Error ? e.message : 'Error al cargar', 'error');
     } finally {
       setCargando(false);
     }
@@ -42,7 +47,6 @@ export function InformacionPage() {
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError(null);
     try {
       if (editandoId) {
         await informationRepository.update(editandoId, form);
@@ -52,8 +56,9 @@ export function InformacionPage() {
       setForm(VACIO);
       setEditandoId(null);
       await cargar();
+      showToast('Guardado correctamente', 'success');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error al guardar');
+      showToast(e instanceof Error ? e.message : 'Error al guardar', 'error');
     }
   }
 
@@ -63,14 +68,21 @@ export function InformacionPage() {
     setEditandoId(id);
   }
 
-  async function handleEliminar(id: string) {
-    if (!confirm('¿Eliminar este registro?')) return;
-    try {
-      await informationRepository.remove(id);
-      await cargar();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error al eliminar');
-    }
+  function handleEliminar(id: string) {
+    showConfirm({
+      title: 'Confirmar eliminación',
+      message: '¿Eliminar este registro?',
+      confirmText: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          await informationRepository.remove(id);
+          await cargar();
+          showToast('Registro eliminado exitosamente', 'success');
+        } catch (e) {
+          showToast(e instanceof Error ? e.message : 'Error al eliminar', 'error');
+        }
+      }
+    });
   }
 
   function handleCancelar() {
@@ -145,18 +157,22 @@ export function InformacionPage() {
                 🕐 {info.horario || '—'}
               </p>
               <div style={{ display: 'flex', gap: '0.4rem' }}>
-                <button
-                  className="btn btn--sm"
-                  onClick={() => handleEditar(info)}
-                >
-                  Editar
-                </button>
-                <button
-                  className="btn btn--sm btn--danger"
-                  onClick={() => handleEliminar(info.id)}
-                >
-                  Eliminar
-                </button>
+                {isAdmin && (
+                  <>
+                    <button
+                      className="btn btn--sm"
+                      onClick={() => handleEditar(info)}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      className="btn btn--sm btn--danger"
+                      onClick={() => handleEliminar(info.id)}
+                    >
+                      Eliminar
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ))}
@@ -164,68 +180,71 @@ export function InformacionPage() {
       )}
 
       {/* Formulario */}
-      <section className="card">
-        <h2 className="card__title">
-          {editandoId ? 'Editar información' : 'Agregar información'}
-        </h2>
+      {isAdmin && (
+        <section className="card">
+          <h2 className="card__title">
+            {editandoId ? 'Editar información' : 'Agregar información'}
+          </h2>
 
-        <form className="form-grid" onSubmit={handleSubmit}>
-          <label className="field">
-            <span>Nombre de la tienda</span>
-            <input
-              required
-              value={form.nombre}
-              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-              placeholder="Ej. Unholy Store"
-            />
-          </label>
+          <form className="form-grid" onSubmit={handleSubmit}>
+            <label className="field">
+              <span>Nombre de la tienda</span>
+              <input
+                required
+                value={form.nombre}
+                onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                placeholder="Ej. Unholy Store"
+              />
+            </label>
 
-          <label className="field">
-            <span>Teléfono</span>
-            <input
-              value={form.telefono}
-              onChange={(e) => setForm({ ...form, telefono: e.target.value })}
-              placeholder="+57 300 000 0000"
-            />
-          </label>
+            <label className="field">
+              <span>Teléfono</span>
+              <input
+                value={form.telefono}
+                onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+                placeholder="+57 300 000 0000"
+              />
+            </label>
 
-          <label className="field">
-            <span>Dirección</span>
-            <input
-              value={form.direccion}
-              onChange={(e) => setForm({ ...form, direccion: e.target.value })}
-              placeholder="Calle, ciudad"
-            />
-          </label>
+            <label className="field">
+              <span>Dirección</span>
+              <input
+                value={form.direccion}
+                onChange={(e) =>
+                  setForm({ ...form, direccion: e.target.value })
+                }
+                placeholder="Calle, ciudad"
+              />
+            </label>
 
-          <label className="field">
-            <span>Horario</span>
-            <input
-              value={form.horario}
-              onChange={(e) => setForm({ ...form, horario: e.target.value })}
-              placeholder="Lun - Sáb: 9am - 7pm"
-            />
-          </label>
+            <label className="field">
+              <span>Horario</span>
+              <input
+                value={form.horario}
+                onChange={(e) => setForm({ ...form, horario: e.target.value })}
+                placeholder="Lun - Sáb: 9am - 7pm"
+              />
+            </label>
 
-          <div className="form-actions">
-            <button type="submit" className="btn btn--primary">
-              {editandoId ? 'Actualizar' : 'Guardar'}
-            </button>
-            {editandoId && (
-              <button
-                type="button"
-                className="btn btn--ghost"
-                onClick={handleCancelar}
-              >
-                Cancelar
+            <div className="form-actions">
+              <button type="submit" className="btn btn--primary">
+                {editandoId ? 'Actualizar' : 'Guardar'}
               </button>
-            )}
-          </div>
-        </form>
-      </section>
+              {editandoId && (
+                <button
+                  type="button"
+                  className="btn btn--ghost"
+                  onClick={handleCancelar}
+                >
+                  Cancelar
+                </button>
+              )}
+            </div>
+          </form>
+        </section>
+      )}
 
       {cargando && <p className="muted">Cargando...</p>}
-      {error && <p className="error">{error}</p>}
       {!cargando && registros.length === 0 && (
         <div className="empty-state">
           <span style={{ fontSize: '2.5rem' }}>ℹ️</span>

@@ -4,36 +4,36 @@ import { useNavigate, Link } from 'react-router-dom';
 
 // Context
 import { useAuth } from '../../../context/AuthContext';
+import { useAlert } from '../../../context/AlertContext';
 
 // Styles
 import './auth.css';
 
 export function RegisterPage() {
   const { register } = useAuth();
+  const { showToast } = useAlert();
   const navigate = useNavigate();
 
   const [nombre, setNombre] = useState('');
   const [clave, setClave] = useState('');
   const [confirmarClave, setConfirmarClave] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
 
     if (!nombre.trim() || !clave.trim() || !confirmarClave.trim()) {
-      setError('Por favor, completa todos los campos');
+      showToast('Por favor, completa todos los campos', 'error');
       return;
     }
 
     if (clave !== confirmarClave) {
-      setError('Las contraseñas no coinciden');
+      showToast('Las contraseñas no coinciden', 'error');
       return;
     }
 
     if (clave.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
+      showToast('La contraseña debe tener al menos 6 caracteres', 'error');
       return;
     }
 
@@ -41,10 +41,11 @@ export function RegisterPage() {
     try {
       const success = await register(nombre, clave);
       if (success) {
+        showToast('Cuenta creada exitosamente', 'success');
         navigate('/');
       }
     } catch (err: any) {
-      setError(err.message || 'Error al registrar el usuario');
+      showToast(err.message || 'Error al registrar el usuario', 'error');
     } finally {
       setLoading(false);
     }
@@ -58,8 +59,6 @@ export function RegisterPage() {
           <h1 className="auth-title">Crear Cuenta</h1>
           <p className="auth-subtitle">Únete al equipo de Unholy Store</p>
         </div>
-
-        {error && <div className="auth-error">{error}</div>}
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="field">

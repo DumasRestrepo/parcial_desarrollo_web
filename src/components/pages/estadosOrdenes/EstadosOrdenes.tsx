@@ -1,6 +1,10 @@
 // Libraries
 import { useEffect, useState } from 'react';
 
+// Context
+import { useAuth } from '../../../context/AuthContext';
+import { useAlert } from '../../../context/AlertContext';
+
 // Interfaces
 import type { EstadoOrden } from '../../../interfaces';
 
@@ -18,11 +22,12 @@ const VACIO: Omit<EstadoOrden, 'id'> = {
 };
 
 export function EstadosOrdenPage() {
+  const { isAdmin } = useAuth();
+  const { showToast, showConfirm } = useAlert();
   const [estados, setEstados] = useState<EstadoOrden[]>([]);
   const [form, setForm] = useState<Omit<EstadoOrden, 'id'>>(VACIO);
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   async function cargar() {
     try {
@@ -30,7 +35,7 @@ export function EstadosOrdenPage() {
       const data = await estadoOrdenRepository.getAll();
       setEstados(data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error al cargar');
+      showToast(e instanceof Error ? e.message : 'Error al cargar', 'error');
     } finally {
       setCargando(false);
     }
@@ -42,7 +47,6 @@ export function EstadosOrdenPage() {
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError(null);
     try {
       if (editandoId) {
         await estadoOrdenRepository.update(editandoId, form);
@@ -52,8 +56,9 @@ export function EstadosOrdenPage() {
       setForm(VACIO);
       setEditandoId(null);
       await cargar();
+      showToast('Guardado correctamente', 'success');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error al guardar');
+      showToast(e instanceof Error ? e.message : 'Error al guardar', 'error');
     }
   }
 
@@ -63,14 +68,21 @@ export function EstadosOrdenPage() {
     setEditandoId(id);
   }
 
-  async function handleEliminar(id: string) {
-    if (!confirm('¿Eliminar este estado?')) return;
-    try {
-      await estadoOrdenRepository.remove(id);
-      await cargar();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error al eliminar');
-    }
+  function handleEliminar(id: string) {
+    showConfirm({
+      title: 'Confirmar eliminación',
+      message: '¿Eliminar este estado?',
+      confirmText: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          await estadoOrdenRepository.remove(id);
+          await cargar();
+          showToast('Registro eliminado exitosamente', 'success');
+        } catch (e) {
+          showToast(e instanceof Error ? e.message : 'Error al eliminar', 'error');
+        }
+      }
+    });
   }
 
   function handleCancelar() {
@@ -88,7 +100,8 @@ export function EstadosOrdenPage() {
       </header>
 
       {/* Formulario */}
-      <section className="card">
+      {isAdmin && (
+        <section className="card">
         <h2 className="card__title">
           {editandoId ? 'Editar estado' : 'Nuevo estado'}
         </h2>
@@ -150,13 +163,13 @@ export function EstadosOrdenPage() {
           </div>
         </form>
       </section>
+      )}
 
       {/* Listado */}
       <section className="card">
         <h2 className="card__title">Listado ({estados.length})</h2>
 
         {cargando && <p className="muted">Cargando...</p>}
-        {error && <p className="error">{error}</p>}
 
         {!cargando && estados.length === 0 && (
           <div className="empty-state">
@@ -218,6 +231,8 @@ export function EstadosOrdenPage() {
                       </span>
                     </td>
                     <td className="table__actions">
+                        {isAdmin && (
+                          <>
                       <button
                         className="btn btn--sm"
                         onClick={() => handleEditar(es)}
@@ -230,7 +245,9 @@ export function EstadosOrdenPage() {
                       >
                         Eliminar
                       </button>
-                    </td>
+                    </>
+                        )}
+                      </td>
                   </tr>
                 ))}
               </tbody>
