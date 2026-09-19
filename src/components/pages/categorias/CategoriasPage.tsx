@@ -8,7 +8,7 @@ import type { Categoria } from '../../../interfaces';
 import { categoriaRepository } from '../../../respositories/categoria.repository';
 
 // Styles
-import '../productos/productos.css';
+import '../pages.css';
 
 const VACIO: Omit<Categoria, 'id'> = {
   nombre: '',
@@ -39,7 +39,7 @@ export function CategoriasPage() {
     cargar();
   }, []);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     try {

@@ -4,6 +4,7 @@ import { Link, NavLink } from 'react-router-dom';
 
 // Context
 import { useTheme, THEMES } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 
 // Styles
 import './layout.css';
@@ -115,8 +116,12 @@ function ThemeDropdown() {
 }
 
 /* ── Header + Navbar ───────────────────────── */
+import { useCart } from '../../context/CartContext';
+
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const { cartCount, toggleCart } = useCart();
 
   return (
     <>
@@ -129,10 +134,81 @@ export function Header() {
           </Link>
 
           <div className="app-header__right">
+            <button
+              className="app-header__cart-btn"
+              onClick={toggleCart}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--color-text)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                position: 'relative',
+                fontSize: '1.25rem',
+                marginRight: '0.5rem',
+              }}
+            >
+              🛒
+              {cartCount > 0 && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '-8px',
+                    right: '-8px',
+                    background: 'var(--color-cta-bg)',
+                    color: 'var(--color-cta-text)',
+                    fontSize: '0.65rem',
+                    fontWeight: 'bold',
+                    padding: '2px 6px',
+                    borderRadius: '10px',
+                  }}
+                >
+                  {cartCount}
+                </span>
+              )}
+            </button>
+
             <ThemeDropdown />
             <div className="app-header__divider" />
-            <span className="app-header__greeting">Hola, admin</span>
-            <div className="app-header__avatar">A</div>
+
+            <div
+              className="app-header__user-info"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}
+            >
+              <span
+                className="app-header__greeting"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-end',
+                  gap: '2px',
+                }}
+              >
+                <span>Hola, {user?.nombre || 'admin'}</span>
+                <button
+                  onClick={logout}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'rgba(255,255,255,0.5)',
+                    fontSize: '0.7rem',
+                    cursor: 'pointer',
+                    padding: 0,
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.color = '#ff5a5f')}
+                  onMouseOut={(e) =>
+                    (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')
+                  }
+                >
+                  Cerrar sesión
+                </button>
+              </span>
+              <div className="app-header__avatar">
+                {user?.nombre ? user.nombre.charAt(0).toUpperCase() : 'A'}
+              </div>
+            </div>
+
             <button
               className={`app-header__hamburger${menuOpen ? ' is-open' : ''}`}
               onClick={() => setMenuOpen((o) => !o)}

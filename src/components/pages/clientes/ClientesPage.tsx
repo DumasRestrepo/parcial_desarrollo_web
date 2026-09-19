@@ -8,7 +8,7 @@ import type { Cliente } from '../../../interfaces';
 import { clienteRepository } from '../../../respositories/cliente.repository';
 
 // Styles
-import '../productos/productos.css';
+import '../pages.css';
 
 const VACIO: Omit<Cliente, 'id'> = {
   nombre: '',
@@ -42,7 +42,7 @@ export function ClientesPage() {
     cargar();
   }, []);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     try {

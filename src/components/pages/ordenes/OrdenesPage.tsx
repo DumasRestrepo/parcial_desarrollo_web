@@ -8,7 +8,7 @@ import type { Orden } from '../../../interfaces';
 import { ordenRepository } from '../../../respositories/orden.repository';
 
 // Styles
-import '../productos/productos.css';
+import '../pages.css';
 
 const today = new Date().toISOString().slice(0, 10);
 
@@ -45,7 +45,7 @@ export function OrdenesPage() {
     cargar();
   }, []);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     try {

@@ -8,7 +8,7 @@ import type { Usuario } from '../../../interfaces';
 import { usuarioRepository } from '../../../respositories/usuario.repository';
 
 // Styles
-import '../productos/productos.css';
+import '../pages.css';
 
 const VACIO: Omit<Usuario, 'id'> = {
   nombre: '',
@@ -39,7 +39,7 @@ export function UsuariosPage() {
     cargar();
   }, []);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     try {

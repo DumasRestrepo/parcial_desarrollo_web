@@ -12,9 +12,10 @@ import { clienteRepository } from '../../respositories/cliente.repository';
 
 // Utils
 import { getProductFallbackImage } from '../../utils/productImage';
+import { useCart } from '../../context/CartContext';
 
 // Styles
-import './productos/productos.css';
+import './pages.css';
 
 type GroupedProductos = Record<string, Producto[]>;
 
@@ -32,6 +33,7 @@ export function HomePage() {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [cargando, setCargando] = useState(true);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     async function cargar() {
@@ -163,9 +165,31 @@ export function HomePage() {
                           <p className="product-card__stock">
                             {p.stock} en stock
                           </p>
-                          <p className="product-card__price">
-                            ${p.precio.toFixed(2)}
-                          </p>
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              marginTop: '0.5rem',
+                            }}
+                          >
+                            <p
+                              className="product-card__price"
+                              style={{ margin: 0 }}
+                            >
+                              ${p.precio.toFixed(2)}
+                            </p>
+                            <button
+                              className="home-hero__btn home-hero__btn--primary"
+                              style={{
+                                padding: '0.4rem 0.8rem',
+                                fontSize: '0.85rem',
+                              }}
+                              onClick={() => addToCart(p)}
+                            >
+                              + Añadir
+                            </button>
+                          </div>
                         </div>
                       </div>
                     );
