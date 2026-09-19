@@ -1,6 +1,10 @@
 // Libraries
 import { useEffect, useState } from 'react';
 
+// Context
+import { useAuth } from '../../../context/AuthContext';
+import { useAlert } from '../../../context/AlertContext';
+
 // Interfaces
 import type { Categoria } from '../../../interfaces';
 
@@ -17,11 +21,12 @@ const VACIO: Omit<Categoria, 'id'> = {
 };
 
 export function CategoriasPage() {
+  const { isAdmin } = useAuth();
+  const { showToast, showConfirm } = useAlert();
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [form, setForm] = useState<Omit<Categoria, 'id'>>(VACIO);
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   async function cargar() {
     try {
@@ -29,7 +34,7 @@ export function CategoriasPage() {
       const data = await categoriaRepository.getAll();
       setCategorias(data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error al cargar');
+      showToast(e instanceof Error ? e.message : 'Error al cargar', 'error');
     } finally {
       setCargando(false);
     }
@@ -41,7 +46,6 @@ export function CategoriasPage() {
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError(null);
     try {
       if (editandoId) {
         await categoriaRepository.update(editandoId, form);
@@ -51,8 +55,9 @@ export function CategoriasPage() {
       setForm(VACIO);
       setEditandoId(null);
       await cargar();
+      showToast('Guardado correctamente', 'success');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error al guardar');
+      showToast(e instanceof Error ? e.message : 'Error al guardar', 'error');
     }
   }
 
@@ -62,14 +67,21 @@ export function CategoriasPage() {
     setEditandoId(id);
   }
 
-  async function handleEliminar(id: string) {
-    if (!confirm('¿Eliminar esta categoría?')) return;
-    try {
-      await categoriaRepository.remove(id);
-      await cargar();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error al eliminar');
-    }
+  function handleEliminar(id: string) {
+    showConfirm({
+      title: 'Confirmar eliminación',
+      message: '¿Eliminar esta categoría?',
+      confirmText: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          await categoriaRepository.remove(id);
+          await cargar();
+          showToast('Registro eliminado exitosamente', 'success');
+        } catch (e) {
+          showToast(e instanceof Error ? e.message : 'Error al eliminar', 'error');
+        }
+      }
+    });
   }
 
   function handleCancelar() {
@@ -87,7 +99,8 @@ export function CategoriasPage() {
       </header>
 
       {/* Formulario */}
-      <section className="card">
+      {isAdmin && (
+        <section className="card">
         <h2 className="card__title">
           {editandoId ? 'Editar categoría' : 'Nueva categoría'}
         </h2>
@@ -139,13 +152,13 @@ export function CategoriasPage() {
           </div>
         </form>
       </section>
+      )}
 
       {/* Listado */}
       <section className="card">
         <h2 className="card__title">Listado ({categorias.length})</h2>
 
         {cargando && <p className="muted">Cargando...</p>}
-        {error && <p className="error">{error}</p>}
 
         {!cargando && categorias.length === 0 && (
           <div className="empty-state">
@@ -182,6 +195,8 @@ export function CategoriasPage() {
                       </span>
                     </td>
                     <td className="table__actions">
+                        {isAdmin && (
+                          <>
                       <button
                         className="btn btn--sm"
                         onClick={() => handleEditar(c)}
@@ -194,7 +209,9 @@ export function CategoriasPage() {
                       >
                         Eliminar
                       </button>
-                    </td>
+                    </>
+                        )}
+                      </td>
                   </tr>
                 ))}
               </tbody>

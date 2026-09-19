@@ -1,6 +1,10 @@
 // Libraries
 import { useEffect, useState } from 'react';
 
+// Context
+import { useAuth } from '../../../context/AuthContext';
+import { useAlert } from '../../../context/AlertContext';
+
 // Interfaces
 import type { Cliente } from '../../../interfaces';
 
@@ -20,11 +24,12 @@ const VACIO: Omit<Cliente, 'id'> = {
 };
 
 export function ClientesPage() {
+  const { isAdmin } = useAuth();
+  const { showToast, showConfirm } = useAlert();
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [form, setForm] = useState<Omit<Cliente, 'id'>>(VACIO);
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   async function cargar() {
     try {
@@ -32,7 +37,7 @@ export function ClientesPage() {
       const data = await clienteRepository.getAll();
       setClientes(data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error al cargar');
+      showToast(e instanceof Error ? e.message : 'Error al cargar', 'error');
     } finally {
       setCargando(false);
     }
@@ -44,7 +49,6 @@ export function ClientesPage() {
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError(null);
     try {
       if (editandoId) {
         await clienteRepository.update(editandoId, form);
@@ -54,8 +58,9 @@ export function ClientesPage() {
       setForm(VACIO);
       setEditandoId(null);
       await cargar();
+      showToast('Guardado correctamente', 'success');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error al guardar');
+      showToast(e instanceof Error ? e.message : 'Error al guardar', 'error');
     }
   }
 
@@ -65,14 +70,21 @@ export function ClientesPage() {
     setEditandoId(id);
   }
 
-  async function handleEliminar(id: string) {
-    if (!confirm('¿Eliminar este cliente?')) return;
-    try {
-      await clienteRepository.remove(id);
-      await cargar();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error al eliminar');
-    }
+  function handleEliminar(id: string) {
+    showConfirm({
+      title: 'Confirmar eliminación',
+      message: '¿Eliminar este cliente?',
+      confirmText: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          await clienteRepository.remove(id);
+          await cargar();
+          showToast('Registro eliminado exitosamente', 'success');
+        } catch (e) {
+          showToast(e instanceof Error ? e.message : 'Error al eliminar', 'error');
+        }
+      }
+    });
   }
 
   function handleCancelar() {
@@ -90,7 +102,8 @@ export function ClientesPage() {
       </header>
 
       {/* Formulario */}
-      <section className="card">
+      {isAdmin && (
+        <section className="card">
         <h2 className="card__title">
           {editandoId ? 'Editar cliente' : 'Nuevo cliente'}
         </h2>
@@ -170,13 +183,13 @@ export function ClientesPage() {
           </div>
         </form>
       </section>
+      )}
 
       {/* Listado */}
       <section className="card">
         <h2 className="card__title">Listado ({clientes.length})</h2>
 
         {cargando && <p className="muted">Cargando...</p>}
-        {error && <p className="error">{error}</p>}
 
         {!cargando && clientes.length === 0 && (
           <div className="empty-state">
@@ -219,6 +232,8 @@ export function ClientesPage() {
                       </span>
                     </td>
                     <td className="table__actions">
+                        {isAdmin && (
+                          <>
                       <button
                         className="btn btn--sm"
                         onClick={() => handleEditar(c)}
@@ -231,7 +246,9 @@ export function ClientesPage() {
                       >
                         Eliminar
                       </button>
-                    </td>
+                    </>
+                        )}
+                      </td>
                   </tr>
                 ))}
               </tbody>

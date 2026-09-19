@@ -14,6 +14,7 @@ interface AuthContextType {
   register: (nombre: string, clave: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -74,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         nombre,
         clave,
         estado: true,
+        rol: 'USER',
       });
 
       setUser(newUser);
@@ -90,8 +92,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('unholy_user');
   };
 
+  const isAdmin = user ? (user.rol === 'USER' ? false : true) : false;
+
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider
+      value={{ user, login, register, logout, loading, isAdmin }}
+    >
       {!loading && children}
     </AuthContext.Provider>
   );

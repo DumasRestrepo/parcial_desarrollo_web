@@ -4,32 +4,29 @@ import { useNavigate, Link } from 'react-router-dom';
 
 // Context
 import { useAuth } from '../../../context/AuthContext';
+import { useAlert } from '../../../context/AlertContext';
 
 // Styles
 import './auth.css';
 
 export function LoginPage() {
   const { login } = useAuth();
+  const { showToast } = useAlert();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     nombre: '',
     clave: '',
-    error: '',
   });
 
-  const { nombre, clave, error } = formData;
+  const { nombre, clave } = formData;
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setFormData((prev) => ({ ...prev, error: '' }));
 
     if (!nombre.trim() || !clave.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        error: 'Por favor, ingresa tu usuario y contraseña',
-      }));
+      showToast('Por favor, ingresa tu usuario y contraseña', 'error');
       return;
     }
 
@@ -37,15 +34,13 @@ export function LoginPage() {
     try {
       const success = await login(nombre, clave);
       if (success) {
+        showToast(`Bienvenido de vuelta, ${nombre}`, 'success');
         navigate('/');
       } else {
-        setFormData((prev) => ({ ...prev, error: 'Credenciales inválidas' }));
+        showToast('Credenciales inválidas', 'error');
       }
     } catch (err: any) {
-      setFormData((prev) => ({
-        ...prev,
-        error: err.message || 'Error al iniciar sesión',
-      }));
+      showToast(err.message || 'Error al iniciar sesión', 'error');
     } finally {
       setLoading(false);
     }
@@ -64,8 +59,6 @@ export function LoginPage() {
           <h1 className="auth-title">Bienvenido de nuevo</h1>
           <p className="auth-subtitle">Ingresa a tu panel de Unholy Store</p>
         </div>
-
-        {error && <div className="auth-error">{error}</div>}
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="field">

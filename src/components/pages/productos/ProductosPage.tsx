@@ -11,6 +11,8 @@ import { productoRepository } from '../../../respositories/producto.repository';
 import { getProductFallbackImage } from '../../../utils/productImage';
 
 // Context
+import { useAuth } from '../../../context/AuthContext';
+import { useAlert } from '../../../context/AlertContext';
 import { useCart } from '../../../context/CartContext';
 
 // Styles
@@ -31,8 +33,9 @@ export function ProductosPage() {
   const [form, setForm] = useState<Omit<Producto, 'id'>>(VACIO);
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const { addToCart } = useCart();
+  const { isAdmin } = useAuth();
+  const { showToast, showConfirm } = useAlert();
 
   async function cargar() {
     try {
@@ -40,7 +43,7 @@ export function ProductosPage() {
       const data = await productoRepository.getAll();
       setProductos(data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error al cargar');
+      showToast(e instanceof Error ? e.message : 'Error al cargar', 'error');
     } finally {
       setCargando(false);
     }
@@ -61,8 +64,9 @@ export function ProductosPage() {
       setForm(VACIO);
       setEditandoId(null);
       await cargar();
+      showToast('Guardado correctamente', 'success');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error al guardar');
+      showToast(e instanceof Error ? e.message : 'Error al guardar', 'error');
     }
   }
 
@@ -72,14 +76,21 @@ export function ProductosPage() {
     setEditandoId(id);
   }
 
-  async function handleEliminar(id: string) {
-    if (!confirm('¿Eliminar este producto?')) return;
-    try {
-      await productoRepository.remove(id);
-      await cargar();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error al eliminar');
-    }
+  function handleEliminar(id: string) {
+    showConfirm({
+      title: 'Confirmar eliminación',
+      message: '¿Eliminar este producto?',
+      confirmText: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          await productoRepository.remove(id);
+          await cargar();
+          showToast('Registro eliminado exitosamente', 'success');
+        } catch (e) {
+          showToast(e instanceof Error ? e.message : 'Error al eliminar', 'error');
+        }
+      }
+    });
   }
 
   function handleCancelar() {
@@ -95,108 +106,111 @@ export function ProductosPage() {
       </header>
 
       {/* Formulario */}
-      <section className="card">
-        <h2 className="card__title">
-          {editandoId ? 'Editar producto' : 'Nuevo producto'}
-        </h2>
+      {isAdmin && (
+        <section className="card">
+          <h2 className="card__title">
+            {editandoId ? 'Editar producto' : 'Nuevo producto'}
+          </h2>
 
-        <form className="form-grid" onSubmit={handleSubmit}>
-          <label className="field">
-            <span>Nombre</span>
-            <input
-              required
-              value={form.nombre}
-              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-            />
-          </label>
+          <form className="form-grid" onSubmit={handleSubmit}>
+            <label className="field">
+              <span>Nombre</span>
+              <input
+                required
+                value={form.nombre}
+                onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+              />
+            </label>
 
-          <label className="field">
-            <span>Descripción</span>
-            <input
-              required
-              value={form.descripcion}
-              onChange={(e) =>
-                setForm({ ...form, descripcion: e.target.value })
-              }
-            />
-          </label>
+            <label className="field">
+              <span>Descripción</span>
+              <input
+                required
+                value={form.descripcion}
+                onChange={(e) =>
+                  setForm({ ...form, descripcion: e.target.value })
+                }
+              />
+            </label>
 
-          <label className="field">
-            <span>Precio</span>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              required
-              value={form.precio}
-              onChange={(e) =>
-                setForm({ ...form, precio: Number(e.target.value) })
-              }
-            />
-          </label>
+            <label className="field">
+              <span>Precio</span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                required
+                value={form.precio}
+                onChange={(e) =>
+                  setForm({ ...form, precio: Number(e.target.value) })
+                }
+              />
+            </label>
 
-          <label className="field">
-            <span>Stock</span>
-            <input
-              type="number"
-              min="0"
-              required
-              value={form.stock}
-              onChange={(e) =>
-                setForm({ ...form, stock: Number(e.target.value) })
-              }
-            />
-          </label>
+            <label className="field">
+              <span>Stock</span>
+              <input
+                type="number"
+                min="0"
+                required
+                value={form.stock}
+                onChange={(e) =>
+                  setForm({ ...form, stock: Number(e.target.value) })
+                }
+              />
+            </label>
 
-          <label className="field">
-            <span>Categoría</span>
-            <input
-              required
-              value={form.categoria}
-              onChange={(e) => setForm({ ...form, categoria: e.target.value })}
-            />
-          </label>
+            <label className="field">
+              <span>Categoría</span>
+              <input
+                required
+                value={form.categoria}
+                onChange={(e) =>
+                  setForm({ ...form, categoria: e.target.value })
+                }
+              />
+            </label>
 
-          <label className="field">
-            <span>URL de imagen</span>
-            <input
-              value={form.imagen}
-              onChange={(e) => setForm({ ...form, imagen: e.target.value })}
-            />
-          </label>
+            <label className="field">
+              <span>URL de imagen</span>
+              <input
+                value={form.imagen}
+                onChange={(e) => setForm({ ...form, imagen: e.target.value })}
+              />
+            </label>
 
-          <label className="field field--check">
-            <input
-              type="checkbox"
-              checked={form.estado}
-              onChange={(e) => setForm({ ...form, estado: e.target.checked })}
-            />
-            <span>Activo</span>
-          </label>
+            <label className="field field--check">
+              <input
+                type="checkbox"
+                checked={form.estado}
+                onChange={(e) => setForm({ ...form, estado: e.target.checked })}
+              />
+              <span>Activo</span>
+            </label>
 
-          <div className="form-actions">
-            <button type="submit" className="btn btn--primary">
-              {editandoId ? 'Actualizar' : 'Crear'}
-            </button>
-            {editandoId && (
-              <button
-                type="button"
-                className="btn btn--ghost"
-                onClick={handleCancelar}
-              >
-                Cancelar
+            <div className="form-actions">
+              <button type="submit" className="btn btn--primary">
+                {editandoId ? 'Actualizar' : 'Crear'}
               </button>
-            )}
-          </div>
-        </form>
-      </section>
+              {editandoId && (
+                <button
+                  type="button"
+                  className="btn btn--ghost"
+                  onClick={handleCancelar}
+                >
+                  Cancelar
+                </button>
+              )}
+            </div>
+          </form>
+        </section>
+      )}
 
       {/* Listado */}
       <section className="card">
         <h2 className="card__title">Listado ({productos.length})</h2>
 
         {cargando && <p>Cargando...</p>}
-        {error && <p className="error">{error}</p>}
 
         {!cargando && productos.length === 0 && (
           <p className="muted">Aún no hay productos.</p>
@@ -263,18 +277,22 @@ export function ProductosPage() {
                         >
                           + Carrito
                         </button>
-                        <button
-                          className="btn btn--sm"
-                          onClick={() => handleEditar(p)}
-                        >
-                          Editar
-                        </button>
-                        <button
-                          className="btn btn--sm btn--danger"
-                          onClick={() => handleEliminar(p.id)}
-                        >
-                          Eliminar
-                        </button>
+                        {isAdmin && (
+                          <>
+                            <button
+                              className="btn btn--sm"
+                              onClick={() => handleEditar(p)}
+                            >
+                              Editar
+                            </button>
+                            <button
+                              className="btn btn--sm btn--danger"
+                              onClick={() => handleEliminar(p.id)}
+                            >
+                              Eliminar
+                            </button>
+                          </>
+                        )}
                       </td>
                     </tr>
                   );
