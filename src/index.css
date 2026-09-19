@@ -1,0 +1,293 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+/* ══════════════════════════════════════════
+   TEMA: Minimalista & Alta Gama (default)
+   ══════════════════════════════════════════ */
+:root,
+[data-theme='elegante'] {
+  --color-primary: #121212;
+  --color-primary-light: #2a2a2a;
+  --color-primary-hover: #000000;
+  --color-secondary: #e5d9c5; /* Nude / Beige Cálido */
+  --color-secondary-soft: #f5efe5;
+  --color-accent: #e5d9c5;
+  --color-accent-soft: #f9f4ed;
+
+  --color-bg: #f8f9fa; /* Blanco Humo */
+  --color-surface: #ffffff;
+  --color-surface-2: #f2f3f5;
+  --color-text: #121212; /* Negro Azabache */
+  --color-muted: #8d99ae; /* Gris Piedra */
+  --color-border: #dde1e8;
+  --color-border-strong: #8d99ae;
+
+  --color-danger: #b91c1c;
+  --color-danger-soft: #fee2e2;
+  --color-success: #15803d;
+  --color-success-soft: #dcfce7;
+  --color-warning: #b45309;
+  --color-warning-soft: #fef3c7;
+
+  /* CTA button uses beige acento con texto oscuro */
+  --color-cta-bg: #121212;
+  --color-cta-text: #ffffff;
+  --color-cta-hover: #2a2a2a;
+
+  --color-nav-bg: #121212;
+  --color-nav-text: #ffffff;
+  --color-nav-active-bg: #e5d9c5;
+  --color-nav-active-text: #121212;
+  --color-nav-hover-bg: rgba(229, 217, 197, 0.12);
+  --color-nav-hover-text: #e5d9c5;
+
+  --color-header-start: #121212;
+  --color-header-end: #2a2a2a;
+  --color-header-border: #e5d9c5;
+
+  --color-hero-start: #121212;
+  --color-hero-end: #1e1e1e;
+  --color-hero-accent: #e5d9c5;
+  --color-hero-label-bg: rgba(229, 217, 197, 0.15);
+  --color-hero-label-text: #e5d9c5;
+  --color-hero-label-border: rgba(229, 217, 197, 0.3);
+
+  --color-stat-icon-bg: #f2f3f5;
+  --color-footer-start: #121212;
+  --color-footer-end: #1a1a1a;
+  --color-footer-accent: #e5d9c5;
+
+  --shadow-xs: 0 1px 2px rgba(18, 18, 18, 0.04);
+  --shadow-sm: 0 2px 8px rgba(18, 18, 18, 0.07);
+  --shadow: 0 4px 16px rgba(18, 18, 18, 0.1);
+  --shadow-lg: 0 12px 36px rgba(18, 18, 18, 0.14);
+}
+
+/* ══════════════════════════════════════════
+   TEMA: Neutra & Orgánica
+   ══════════════════════════════════════════ */
+[data-theme='organica'] {
+  --color-primary: #2f3e46; /* Verde Olivo Profundo */
+  --color-primary-light: #3d5159;
+  --color-primary-hover: #1e2d33;
+  --color-secondary: #c86d51; /* Terracota Suave */
+  --color-secondary-soft: #f5e9e4;
+  --color-accent: #c86d51;
+  --color-accent-soft: #fdf0ec;
+
+  --color-bg: #f4f1ea; /* Beige Arena */
+  --color-surface: #fdf9f4;
+  --color-surface-2: #ede9e0;
+  --color-text: #2f3e46;
+  --color-muted: #a5a58d; /* Gris Visón */
+  --color-border: #ddd9ce;
+  --color-border-strong: #a5a58d;
+
+  --color-danger: #b91c1c;
+  --color-danger-soft: #fee2e2;
+  --color-success: #3a7d44;
+  --color-success-soft: #d1ead4;
+  --color-warning: #b45309;
+  --color-warning-soft: #fef3c7;
+
+  --color-cta-bg: #c86d51;
+  --color-cta-text: #ffffff;
+  --color-cta-hover: #b05a40;
+
+  --color-nav-bg: #2f3e46;
+  --color-nav-text: rgba(255, 255, 255, 0.82);
+  --color-nav-active-bg: #c86d51;
+  --color-nav-active-text: #ffffff;
+  --color-nav-hover-bg: rgba(200, 109, 81, 0.12);
+  --color-nav-hover-text: #c86d51;
+
+  --color-header-start: #2f3e46;
+  --color-header-end: #3d5159;
+  --color-header-border: #c86d51;
+
+  --color-hero-start: #2f3e46;
+  --color-hero-end: #3d5159;
+  --color-hero-accent: #c86d51;
+  --color-hero-label-bg: rgba(200, 109, 81, 0.15);
+  --color-hero-label-text: #f2a08a;
+  --color-hero-label-border: rgba(200, 109, 81, 0.3);
+
+  --color-stat-icon-bg: #ede9e0;
+  --color-footer-start: #2f3e46;
+  --color-footer-end: #1e2d33;
+  --color-footer-accent: #c86d51;
+
+  --shadow-xs: 0 1px 2px rgba(47, 62, 70, 0.05);
+  --shadow-sm: 0 2px 8px rgba(47, 62, 70, 0.08);
+  --shadow: 0 4px 16px rgba(47, 62, 70, 0.11);
+  --shadow-lg: 0 12px 36px rgba(47, 62, 70, 0.15);
+}
+
+/* ══════════════════════════════════════════
+   TEMA: Vigorosa & Juvenil (Streetwear)
+   ══════════════════════════════════════════ */
+[data-theme='streetwear'] {
+  --color-primary: #0b132b; /* Azul Marino Oscuro */
+  --color-primary-light: #1a2540;
+  --color-primary-hover: #060c1a;
+  --color-secondary: #ff5a5f; /* Coral / Naranja Neón */
+  --color-secondary-soft: #fff0f0;
+  --color-accent: #ff5a5f;
+  --color-accent-soft: #fff5f5;
+
+  --color-bg: #ffffff; /* Blanco Puro */
+  --color-surface: #ffffff;
+  --color-surface-2: #f7f8fb;
+  --color-text: #0b132b;
+  --color-muted: #4a5568; /* Gris Acero */
+  --color-border: #e2e5ec;
+  --color-border-strong: #4a5568;
+
+  --color-danger: #dc2626;
+  --color-danger-soft: #fee2e2;
+  --color-success: #16a34a;
+  --color-success-soft: #dcfce7;
+  --color-warning: #d97706;
+  --color-warning-soft: #fef3c7;
+
+  --color-cta-bg: #ff5a5f;
+  --color-cta-text: #ffffff;
+  --color-cta-hover: #e6454a;
+
+  --color-nav-bg: #0b132b;
+  --color-nav-text: rgba(255, 255, 255, 0.75);
+  --color-nav-active-bg: #ff5a5f;
+  --color-nav-active-text: #ffffff;
+  --color-nav-hover-bg: rgba(255, 90, 95, 0.12);
+  --color-nav-hover-text: #ff5a5f;
+
+  --color-header-start: #0b132b;
+  --color-header-end: #1a2540;
+  --color-header-border: #ff5a5f;
+
+  --color-hero-start: #0b132b;
+  --color-hero-end: #1a2540;
+  --color-hero-accent: #ff5a5f;
+  --color-hero-label-bg: rgba(255, 90, 95, 0.18);
+  --color-hero-label-text: #ff8589;
+  --color-hero-label-border: rgba(255, 90, 95, 0.35);
+
+  --color-stat-icon-bg: #f7f8fb;
+  --color-footer-start: #0b132b;
+  --color-footer-end: #060c1a;
+  --color-footer-accent: #ff5a5f;
+
+  --shadow-xs: 0 1px 2px rgba(11, 19, 43, 0.05);
+  --shadow-sm: 0 2px 8px rgba(11, 19, 43, 0.08);
+  --shadow: 0 4px 16px rgba(11, 19, 43, 0.12);
+  --shadow-lg: 0 12px 36px rgba(11, 19, 43, 0.16);
+}
+
+/* ══════════════════════════════════════════
+   TIPOGRAFÍA Y GEOMETRÍA (compartido)
+   ══════════════════════════════════════════ */
+:root {
+  --font-title: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  --radius: 8px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+  --transition: 160ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ══════════════════════════════════════════
+   RESET
+   ══════════════════════════════════════════ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html,
+body,
+#root {
+  min-height: 100vh;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.65;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-title);
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+h1 {
+  font-size: clamp(1.75rem, 4vw, 2.4rem);
+}
+h2 {
+  font-size: clamp(1.25rem, 3vw, 1.6rem);
+}
+h3 {
+  font-size: 1.1rem;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--transition);
+}
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-size: inherit;
+}
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+input::placeholder {
+  color: var(--color-border-strong);
+  opacity: 0.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  width: 100%;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  opacity: 0.5;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}
