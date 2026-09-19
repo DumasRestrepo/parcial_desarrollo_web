@@ -8,7 +8,7 @@ import type { Information } from '../../../interfaces';
 import { informationRepository } from '../../../respositories/information.repository';
 
 // Styles
-import '../productos/productos.css';
+import '../pages.css';
 
 const VACIO: Omit<Information, 'id'> = {
   nombre: '',
@@ -40,7 +40,7 @@ export function InformacionPage() {
     cargar();
   }, []);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     try {

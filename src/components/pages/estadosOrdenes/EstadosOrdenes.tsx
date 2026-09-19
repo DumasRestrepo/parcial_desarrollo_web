@@ -8,7 +8,7 @@ import type { EstadoOrden } from '../../../interfaces';
 import { estadoOrdenRepository } from '../../../respositories/estadoOrden.repository';
 
 // Styles
-import '../productos/productos.css';
+import '../pages.css';
 
 const VACIO: Omit<EstadoOrden, 'id'> = {
   nombre: '',
@@ -40,7 +40,7 @@ export function EstadosOrdenPage() {
     cargar();
   }, []);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     try {

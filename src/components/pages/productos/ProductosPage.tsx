@@ -10,8 +10,11 @@ import { productoRepository } from '../../../respositories/producto.repository';
 // Utils
 import { getProductFallbackImage } from '../../../utils/productImage';
 
+// Context
+import { useCart } from '../../../context/CartContext';
+
 // Styles
-import './productos.css';
+import '../pages.css';
 
 const VACIO: Omit<Producto, 'id'> = {
   nombre: '',
@@ -29,6 +32,7 @@ export function ProductosPage() {
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { addToCart } = useCart();
 
   async function cargar() {
     try {
@@ -46,7 +50,7 @@ export function ProductosPage() {
     cargar();
   }, []);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
       if (editandoId) {
@@ -244,7 +248,21 @@ export function ProductosPage() {
                           {p.estado ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
-                      <td className="table__actions">
+                      <td
+                        className="table__actions"
+                        style={{
+                          display: 'flex',
+                          padding: '11%',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <button
+                          className="btn btn--sm btn--primary"
+                          onClick={() => addToCart(p)}
+                        >
+                          + Carrito
+                        </button>
                         <button
                           className="btn btn--sm"
                           onClick={() => handleEditar(p)}
